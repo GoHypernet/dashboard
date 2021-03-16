@@ -1,9 +1,11 @@
 .git
-.github
-components
+# .github
+# components
+# .env
+# .env.local
+# .env.*
 node_modules
-pages
-styles
+# styles
 .dockerignore
 .DS_Store
 .gitignore

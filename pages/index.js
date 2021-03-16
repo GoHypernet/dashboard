@@ -2,81 +2,38 @@ import Dashboard from '../components/dashboard'
 
 // Widgets
 import DateTime from '../components/widgets/datetime'
-import PageSpeedInsightsScore from '../components/widgets/pagespeed-insights/score'
-import PageSpeedInsightsStats from '../components/widgets/pagespeed-insights/stats'
-import JiraIssueCount from '../components/widgets/jira/issue-count'
-import SonarQube from '../components/widgets/sonarqube'
-import JenkinsJobStatus from '../components/widgets/jenkins/job-status'
-import JenkinsJobHealth from '../components/widgets/jenkins/job-health'
-import JenkinsBuildDuration from '../components/widgets/jenkins/build-duration'
-import BitbucketPullRequestCount from '../components/widgets/bitbucket/pull-request-count'
-import ElasticsearchHitCount from '../components/widgets/elasticsearch/hit-count'
-import GitHubIssueCount from '../components/widgets/github/issue-count'
+import useSWR from 'swr'
+import GenericDisplay from "../components/widgets/vector/simple-dash"
 
 // Theme
-import lightTheme from '../styles/light-theme'
+import darkTheme from '../styles/dark-theme'
 // import darkTheme from '../styles/dark-theme'
+const fetcher = url => fetch(url).then(r => r.json())
+export default function Index() {
+  const {data, error} = useSWR("/api/metrics", fetcher, {
+    refreshInterval: 15000,
+    revalidateOnReconnect: true,
+  });
 
-export default () => (
-  <Dashboard theme={lightTheme}>
+  if(error || ! data) {
+    return <Dashboard theme={darkTheme}>
+        <DateTime />
+      </Dashboard>
+  }
+
+  const uptime = Math.round(new Date().getTime()/1000 - data['router_process_start_time_seconds'].value)
+
+  return <Dashboard theme={darkTheme}>
     <DateTime />
+    <GenericDisplay title="User CPU" value={data['router_process_cpu_user_seconds_total'].value.toFixed(2)}></GenericDisplay>
+    <GenericDisplay title="System CPU" value={data['router_process_cpu_system_seconds_total'].value.toFixed(2)}></GenericDisplay>
+    <GenericDisplay title="Total CPU" value={data['router_process_cpu_seconds_total'].value.toFixed(2)}></GenericDisplay>
+    <GenericDisplay title="Uptime" value={uptime + "s"}></GenericDisplay>
 
-    <PageSpeedInsightsScore url='https://github.com' />
+    <GenericDisplay title="Resident Memory" value={Math.round(data['router_process_resident_memory_bytes'].value/1024/1024) + " MB"}>MB</GenericDisplay>
+    <GenericDisplay title="Liquidity 1337 0x00" value={data['router_onchain_liquidity{chainName="1337",chainId="1337",assetName="Token",assetId="0x0000000000000000000000000000000000000000"}'].value.toPrecision(2)}></GenericDisplay>
+    <GenericDisplay title="Liquidity 1337 0x9FBDa" value={data['router_onchain_liquidity{chainName="1337",chainId="1337",assetName="Token",assetId="0x9FBDa871d559710256a2502A2517b794B482Db40"}'].value.toPrecision(2)}></GenericDisplay>
+    <GenericDisplay title="Liquidity Rinkeby 0x00" value={data['router_process_cpu_system_seconds_total'].value.toFixed(2)}></GenericDisplay>
 
-    <PageSpeedInsightsStats url='https://github.com' />
-
-    <JiraIssueCount
-      title='JIRA Open Bugs'
-      url='https://crossorigin.me/https://jira.atlassian.com'
-      query='type=Bug AND project="Bitbucket Server" AND resolution=Unresolved ORDER BY priority DESC,created DESC'
-    />
-
-    <BitbucketPullRequestCount
-      title='Bitbucket Open PR'
-      url='https://crossorigin.me/https://bitbucket.typo3.com'
-      project='EXT'
-      repository='blog'
-    />
-
-    <SonarQube
-      url='https://crossorigin.me/https://sonarcloud.io'
-      componentKey='com.icegreen:greenmail-parent'
-    />
-
-    <JenkinsJobStatus
-      url='https://crossorigin.me/https://builds.apache.org'
-      jobs={[
-        { label: 'JMeter', path: 'JMeter-trunk' },
-        { label: 'Log4j Kotlin', path: 'Log4jKotlin', branch: 'master' }
-      ]}
-    />
-
-    <JenkinsJobHealth
-      url='https://crossorigin.me/https://builds.apache.org'
-      jobs={[
-        { label: 'JMeter', path: 'JMeter-trunk' },
-        { label: 'Log4j Kotlin', path: 'Log4jKotlin', branch: 'master' }
-      ]}
-    />
-
-    <JenkinsBuildDuration
-      url='https://crossorigin.me/https://builds.apache.org'
-      jobs={[
-        { label: 'JMeter', path: 'JMeter-trunk' },
-        { label: 'Log4j Kotlin', path: 'Log4jKotlin', branch: 'master' }
-      ]}
-    />
-
-    <ElasticsearchHitCount
-      title='Log Hits'
-      url='https://crossorigin.me/http://ec2-34-210-144-223.us-west-2.compute.amazonaws.com:9200'
-      index='blog'
-      query='user:dilbert'
-    />
-
-    <GitHubIssueCount
-      owner='danielbayerlein'
-      repository='dashboard'
-    />
   </Dashboard>
-)
+}

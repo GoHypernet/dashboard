@@ -1,21 +1,23 @@
-FROM node:alpine
-
-# Create app directory
-RUN mkdir -p /usr/src/app
+FROM ubuntu:20.04 AS builder
 WORKDIR /usr/src/app
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt update && apt install -y nodejs npm
+COPY package.json .
+RUN npm install
+COPY . .
+RUN npm run build
 
-# Set environment variable
+
+FROM ubuntu:20.04
+WORKDIR /usr/src/app
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt update && apt install -y nodejs npm
+COPY package.json package-lock.json /usr/src/app/
+RUN npm install --only=prod
+
+COPY --from=builder /usr/src/app .
+
 ENV NODE_ENV production
-
-# Install app dependencies
-COPY package.json yarn.lock /usr/src/app/
-RUN yarn --pure-lockfile && yarn cache clean
-
-# Bundle app source
-COPY . /usr/src/app
-
-# Port
 EXPOSE 3000
-
 # Start
-CMD [ "yarn", "start" ]
+CMD [ "npm", "run", "start" ]
