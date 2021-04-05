@@ -31,8 +31,6 @@ export default function Index() {
     <GenericDisplay title="Uptime" value={uptime + "s"}></GenericDisplay>
 
     <GenericDisplay title="Resident Memory" value={Math.round(data['router_process_resident_memory_bytes'].value/1024/1024) + " MB"}>MB</GenericDisplay>
-    <GenericDisplay title="Liquidity 1337 0x00" value={data['router_onchain_liquidity{chainName="1337",chainId="1337",assetName="Token",assetId="0x0000000000000000000000000000000000000000"}'].value.toPrecision(2)}></GenericDisplay>
-    <GenericDisplay title="Liquidity 1337 0x9FBDa" value={data['router_onchain_liquidity{chainName="1337",chainId="1337",assetName="Token",assetId="0x9FBDa871d559710256a2502A2517b794B482Db40"}'].value.toPrecision(2)}></GenericDisplay>
     <GenericDisplay title="Liquidity Rinkeby 0x00" value={data['router_process_cpu_system_seconds_total'].value.toFixed(2)}></GenericDisplay>
 
   </Dashboard>
