@@ -1,11 +1,10 @@
 import promparse from "@yolean/promparse"
+import envConfig from "../../auth";
 
-const METRICS_URL = process.env.METRICS_URL;
-console.log("Using metrics URL ", METRICS_URL);
 
 export default async function handler(req, res) {
-    const scrape = await fetch(METRICS_URL);
+    const scrape = await fetch(envConfig.metrics.url);
     const parsed = promparse(await scrape.text());
-    res.status(200).json(parsed)
+    res.json(parsed);
   }
   
