@@ -4,6 +4,9 @@ import Dashboard from '../components/dashboard'
 import DateTime from '../components/widgets/datetime'
 import useSWR from 'swr'
 import GenericDisplay from "../components/widgets/vector/simple-dash"
+import ButtonDisplay from "../components/widgets/vector/simple-button"
+import envConfig from "../auth";
+
 
 // Theme
 import darkTheme from '../styles/dark-theme'
@@ -29,6 +32,7 @@ export default function Index() {
     <GenericDisplay title="System CPU" value={data['router_process_cpu_system_seconds_total'].value.toFixed(2)}></GenericDisplay>
     <GenericDisplay title="Total CPU" value={data['router_process_cpu_seconds_total'].value.toFixed(2)}></GenericDisplay>
     <GenericDisplay title="Uptime" value={uptime + "s"}></GenericDisplay>
+    <ButtonDisplay title="Rebalance" value="Now" url="/api/rebalance"></ButtonDisplay>
 
     <GenericDisplay title="Resident Memory" value={Math.round(data['router_process_resident_memory_bytes'].value/1024/1024) + " MB"}>MB</GenericDisplay>
     <GenericDisplay title="Liquidity Rinkeby 0x00" value={data['router_process_cpu_system_seconds_total'].value.toFixed(2)}></GenericDisplay>
